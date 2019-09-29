@@ -3,7 +3,7 @@
 namespace ProjectModel
 {
     [Serializable]
-    internal class Task
+    public class Task
     {
         // TODO Requisitos?
 

@@ -4,21 +4,27 @@ using System.Text;
 
 namespace ProjectModel
 {
-    enum Phase
+    /// <summary>
+    /// Representa una fase en el proyecto de la construcción
+    /// </summary>
+    public enum Phase
     {
         OBRA_GRUESA,
         TERMINACIONES,
         INSTALACIONES
     };
     
-    class Project
+    /// <summary>
+    /// Asocia las fases y zonas con las componentes estructurales de la construcción
+    /// </summary>
+    public class Building
     {
         private Dictionary<(Phase, int), List<Structure>> structures;
 
         /// <summary>
-        /// Inicializa un proyecto vacío
+        /// Inicializa un proyecto de construcción vacío
         /// </summary>
-        public Project()
+        public Building()
         {
             structures = new Dictionary<(Phase, int), List<Structure>>();
         }
@@ -32,15 +38,13 @@ namespace ProjectModel
             Phase phase = structure.Task.Phase;
             int zone = structure.Task.Zone;
 
-            List<Structure> structure_list;
-
-            if(!structures.TryGetValue((phase, zone), out structure_list))
+            if (!structures.TryGetValue((phase, zone), out List<Structure> structure_list))
             {
                 structure_list = new List<Structure>();
                 structures.Add((phase, zone), structure_list);
             }
 
             structure_list.Add(structure);
-        }        
+        }
     }
 }
