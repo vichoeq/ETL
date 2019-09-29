@@ -29,7 +29,7 @@ namespace Extractors
 
         public List<Material> Extract()
         {
-            List<Materials> rows_info = new List<Materials>();
+            List<Material> rows_info = new List<Material>();
 
             for (int i = 1; i <= rowCount; i++)
             {
@@ -44,7 +44,7 @@ namespace Extractors
                             row_info[XlRange.Cells[3, j].Value2.ToString()] = XlRange.Cells[i, j].Value2.ToString();
                         }
                     }
-                    Material newMaterial = new Material(row_info["Tipo de familia"], row_info["Precio Unitario del item"],
+                    Material newMaterial = new Material(row_info["Tipo de familia"], Convert.ToInt32(row_info["Precio Unitario del item"]),
                                                         row_info["Unidad"], row_info["Familia"]);
                     rows_info.Add(newMaterial);
                 }                
