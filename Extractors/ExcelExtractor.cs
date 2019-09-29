@@ -45,7 +45,7 @@ namespace Extractors
                         }
                     }
                     Material newMaterial = new Material(row_info["Tipo de familia"], row_info["Precio Unitario del item"],
-                                                        row_info["Unidad"]);
+                                                        row_info["Unidad"], row_info["Familia"]);
                     rows_info.Add(newMaterial);
                 }                
             }
