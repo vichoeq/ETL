@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Excel = Microsoft.Office.Interop.Excel;
+using ProjectModel;
 
 namespace Extractors
 {
@@ -26,14 +27,15 @@ namespace Extractors
 
         }
 
-        public List<Dictionary<string, string>> Extract()
+        public List<Material> Extract()
         {
-            List<Dictionary<string, string>> rows_info = new List<Dictionary<string, string>>();
+            List<Materials> rows_info = new List<Materials>();
 
             for (int i = 1; i <= rowCount; i++)
             {
                 if (XlRange.Cells[i, 2] != null && XlRange.Cells[i, 2].Value2 != null)
                 {
+                    //the data is preprocess by a dictionary so the parser is agnostic to the order of the columns
                     Dictionary<string, string> row_info = new Dictionary<string, string>();
                     for (int j = 1; j <= colCount; j++)
                     {
@@ -42,7 +44,9 @@ namespace Extractors
                             row_info[XlRange.Cells[3, j].Value2.ToString()] = XlRange.Cells[i, j].Value2.ToString();
                         }
                     }
-                    rows_info.Add(row_info);
+                    Material newMaterial = new Material(row_info["Tipo de familia"], row_info["Precio Unitario del item"],
+                                                        row_info["Unidad"]);
+                    rows_info.Add(newMaterial);
                 }                
             }
             return rows_info;
