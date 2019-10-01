@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
+using Extractors;
 ///
 namespace RevitPlugin
 {
@@ -29,53 +31,92 @@ namespace RevitPlugin
         /// <param name="elements"></param>
         /// <returns></returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
-
         {
             // crear aplicación
             Application app = commandData.Application.Application;
             Document activeDoc = commandData.Application.ActiveUIDocument.Document;
 
-            // Ventana inicial 
-            TaskDialog mainDialog = new TaskDialog("Hello");
-            mainDialog.MainInstruction = "Bienvenidos!";
-            mainDialog.MainContent =
-             "Ingresssssa los archivos Excel y Project de tu proyecto.";
-            mainDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1,
-                          "Seleccione archivo Excel");
-            mainDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2,
-                                      "Seleccione archivo Project");
+            bool done = false;
 
-            TaskDialogResult tResult = mainDialog.Show();
-
-            // Según opción seleccionada abre archivo con OpenFileDialog
-            if (TaskDialogResult.CommandLink1 == tResult)
-                {
-                FileOpenDialog openFileDialog1 = new FileOpenDialog("Excel files|*.xlsm;xls");
-                openFileDialog1.Show();
-                ModelPath userPath1 = openFileDialog1.GetSelectedModelPath();
-
-                //Se pasa ModelPath a string
-                ModelPathUtils.ConvertModelPathToUserVisiblePath(userPath1);
-                TaskDialog userDialog1 = new TaskDialog("Archivo");
-                userDialog1.MainContent = "Seleccionaste " + userPath1;
-                userDialog1.Show();
-            }
-
-            else if (TaskDialogResult.CommandLink2 == tResult)
+            while(!done)
             {
-                FileOpenDialog openFileDialog2 = new FileOpenDialog("Project files|*.mpp");
-                openFileDialog2.Show();
-                ModelPath userPath2 =  openFileDialog2.GetSelectedModelPath();
-                ModelPathUtils.ConvertModelPathToUserVisiblePath(userPath2);
-                TaskDialog userDialog2 = new TaskDialog("Archivo seleccionado");
-                userDialog2.MainContent = "Seleccionasblablablaaaaaaaaste " + ModelPathUtils.ConvertModelPathToUserVisiblePath(userPath2);
-                userDialog2.Show();
+                // Ventana inicial 
+                TaskDialog mainDialog = new TaskDialog("CIPYCS Extractor");
+                mainDialog.MainInstruction = "Bienvenidos!";
+                mainDialog.MainContent =
+                 "Ingresa los archivos Excel y Project de tu proyecto";
 
+                bool ready = true;
+
+                string excelDialog;
+                if(string.Equals(excelPath, ""))
+                {
+                    ready = false;
+                    excelDialog = "Selecciona archivo Excel";
+                }
+                else
+                {
+                    excelDialog = "" + Path.GetFileName(excelPath) + " seleccionado. ¿Escoger otro?";
+                }
+                
+                mainDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, excelDialog);
+
+                string projectDialog;
+                if(string.Equals(projectPath, ""))
+                {
+                    ready = false;
+                    projectDialog = "Selecciona archivo Project";
+                }
+                else
+                {
+                    projectDialog = "" + Path.GetFileName(projectPath) + " seleccionado. ¿Escoger otro?";
+                }
+
+                mainDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, projectDialog);
+
+                if(ready)
+                {
+                    mainDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink3, "Exportar");
+                }
+
+                TaskDialogResult tResult = mainDialog.Show();
+
+                switch(tResult)
+                {
+                    case TaskDialogResult.CommandLink1:
+                        excelPath = ChooseFile("Excel files|*.xlsm;xls");
+                        break;
+                    case TaskDialogResult.CommandLink2:
+                        projectPath = ChooseFile("Project files|*.mpp");
+                        break;
+                    case TaskDialogResult.CommandLink3:
+                        ETL(excelPath, projectPath, activeDoc, ".");
+                        done = true;
+                        break;
+                    default:
+                        throw new Exception("Comando inválido");
+                }
             }
 
+            return Result.Succeeded;
+        }
 
-            return Autodesk.Revit.UI.Result.Succeeded;
+        private void ETL(string excelPath, string projectPath, Document revit, string outputPath)
+        {
+            // ExcelExtractor excelExtractor = new ExcelExtractor(excelPath);
 
+            // MicrosoftProjectFile mpp = new MicrosoftProjectFile(projectPath);
+            
+            // Hace cosas del ETL
+        }
+
+        private string ChooseFile(string format)
+        {
+            FileOpenDialog openFileDialog = new FileOpenDialog(format);
+            openFileDialog.Show();
+            ModelPath userPath = openFileDialog.GetSelectedModelPath();
+            ModelPathUtils.ConvertModelPathToUserVisiblePath(userPath);
+            return ModelPathUtils.ConvertModelPathToUserVisiblePath(userPath);
         }
 
     }
