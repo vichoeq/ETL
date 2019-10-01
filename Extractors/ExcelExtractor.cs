@@ -8,6 +8,9 @@ using ProjectModel;
 
 namespace Extractors
 {
+    /// <summary>
+    /// Clase encargada de extraer y paresar la información de materiales de un archivo .xlsm
+    /// </summary>
     public class ExcelExtractor
     {
         public string Path;
@@ -15,6 +18,10 @@ namespace Extractors
         int rowCount;
         int colCount;
 
+        /// <summary>
+        /// Abre un archivo de Xlrange de Microsoft Excel
+        /// </summary>
+        /// <param name="path">Ruta al archivo .xlsm</param>
         public ExcelExtractor(string path)
         {
             Path = path;
@@ -27,6 +34,10 @@ namespace Extractors
 
         }
 
+        /// <summary>
+        /// Extrae todos los materiales del archivo, asociandolas a su familia, fase 
+        /// </summary>
+        /// <returns>Un diccionario con la lista de materiales correspondientes a una misma familia, fase</returns>
         public Dictionary<(string, Phase), List<Material>> Extract()
         {
             //List<Material> rows_info = new List<Material>();
