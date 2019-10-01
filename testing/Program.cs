@@ -11,16 +11,20 @@ namespace testing
     {
         static void Main(string[] args)
         {
-            string pathExcel = @"C:\Users\Vicho\Documents\PUC\2019-2\Capstone\ETL\data\Estimación de costos.xlsm";
-            string pathProject = @"C:\Users\Vicho\Documents\PUC\2019-2\Capstone\ETL\data\Modelo de proceso.mpp";
+            string pathExcel = @"C:\Users\Usuario\Documents\archibos proyecto capstone\costos.xlsm";
+            string pathProject = @"C:\Users\Usuario\Documents\archibos proyecto capstone\Modelo de proceso.mpp";
             ExcelExtractor excelExtractor = new ExcelExtractor(pathExcel);
             MicrosoftProjectFile projectFileExtractor = new MicrosoftProjectFile(pathProject);
-            List<Material> materials = excelExtractor.Extract();
+            Dictionary<(string, Phase), List<Material>> materials = excelExtractor.Extract();
             Dictionary<(string, Phase, int), List<Task>> tasks = projectFileExtractor.Extract();
             Console.WriteLine("Materials:");
-            foreach (Material material in materials)
+            foreach (KeyValuePair<(string, Phase), List<Material>> entry in materials)
             {
-                Console.WriteLine(material.Name);
+                Console.WriteLine(entry.Key.Item1 + "/" + entry.Key.Item2.ToString() + ":");
+                foreach (Material material in entry.Value)
+                {
+                    Console.WriteLine(material.Name);
+                }
             }
             Console.WriteLine("Task:");
             foreach (KeyValuePair<(string, Phase, int), List<Task>> entry in tasks)
@@ -30,7 +34,6 @@ namespace testing
                 {
                     Console.WriteLine(task.Name);
                 }
-                // do something with entry.Value or entry.Key
             }
 
             var key = Console.ReadKey();

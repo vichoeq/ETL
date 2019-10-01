@@ -27,12 +27,26 @@ namespace Extractors
 
         }
 
-        public List<Material> Extract()
+        public Dictionary<(string, Phase), List<Material>> Extract()
         {
-            List<Material> rows_info = new List<Material>();
+            //List<Material> rows_info = new List<Material>();
+            Dictionary<(string, Phase), List<Material>> materialsInfo = new Dictionary<(string, Phase), List<Material>>();
 
             for (int i = 4; i <= rowCount; i++)
             {
+                Phase currentPhase = Phase.OBRA_GRUESA;
+                if (XlRange.Cells[i, 1] != null &&  XlRange.Cells[i, 1].Value2 != null) 
+                {
+                    foreach(string phase in Enum.GetNames(typeof(Phase)))
+                    {
+
+                        if (phase == XlRange.Cells[i, 1].Value2.ToString().Replace(" ", "_"))
+                        {
+                            //Console.WriteLine("Phase:" + phase );
+                            currentPhase = PhaseFromString(XlRange.Cells[i, 1].Value2.ToString());
+                        }
+                    }
+                }
                 if (XlRange.Cells[i, 2] != null && XlRange.Cells[i, 2].Value2 != null)
                 {
                     //Console.WriteLine("row:" + i.ToString());
@@ -47,13 +61,34 @@ namespace Extractors
                         }
                     }
                     Material newMaterial = new Material(row_info["Tipo de familia"], Convert.ToInt32(row_info["Precio Unitario del item"]),row_info["Unidad"], row_info["Familia"]);
-                    rows_info.Add(newMaterial);
+
+                    if (!materialsInfo.TryGetValue((newMaterial.Family, currentPhase), out List<Material> materialList))
+                    {
+                        materialList = new List<Material>();
+                        materialsInfo.Add((newMaterial.Family, currentPhase), materialList);
+                    }
+                    materialList.Add(newMaterial);
+
                 }                
             }
-            return rows_info;
+            return materialsInfo;
+
+
         }
-
-
-
+        private static Phase PhaseFromString(string phase)
+        {
+            switch (phase)
+            {
+                case "OBRA GRUESA":
+                    return Phase.OBRA_GRUESA;
+                case "TERMINACIONES":
+                    return Phase.TERMINACIONES;
+                case "INSTALACIONES":
+                    return Phase.INSTALACIONES;
+                default:
+                    throw new Exception("Fase inválida: \"" + phase + "\"");
+            }
+        }
     }
+
 }
