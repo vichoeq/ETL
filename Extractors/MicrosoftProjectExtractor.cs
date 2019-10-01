@@ -50,9 +50,7 @@ namespace Extractors
                     string taskZone = taskFields[2];
 
                     // En los archivos de ejemplo una tarea puede estar en más de una zona. En ese caso aparece como "zona 1,2"
-                    taskZone = taskZone.Replace("zona", "").Trim();
-                    string[] zones = taskZone.Split(',');
-
+                    
                     string taskPhase;
                     // TODO es esto importante? 
                     string taskNivel;           
@@ -68,6 +66,8 @@ namespace Extractors
                         taskNivel = t.ParentTask.ParentTask.Name;
                     }
 
+                    taskZone = taskZone.Replace("zona", "").Trim();
+                    string[] zones = taskZone.Split(',');
                     // En caso de que una tarea abarque más de una zona, se convierte en múltiples tareas, una para cada zona.
                     foreach (string z in zones)
                     {
