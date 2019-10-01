@@ -3,48 +3,46 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace ProjectModel
-{
-    /// <summary>
-    /// Representa una fase en el proyecto de la construcción
-    /// </summary>
-    public enum Phase
-    {
-        OBRA_GRUESA,
-        TERMINACIONES,
-        INSTALACIONES
-    };
-    
+{    
     /// <summary>
     /// Asocia las fases y zonas con las componentes estructurales de la construcción
     /// </summary>
     public class Building
     {
-        private Dictionary<(Phase, int), List<Structure>> structures;
+        private Dictionary<(Phase, Zone, Level), List<Element>> elements;
 
         /// <summary>
         /// Inicializa un proyecto de construcción vacío
         /// </summary>
         public Building()
         {
-            structures = new Dictionary<(Phase, int), List<Structure>>();
+            elements = new Dictionary<(Phase, Zone, Level), List<Element>>();
         }
 
         /// <summary>
         /// Agrega un elemento estructural de la construcción al proyecto
         /// </summary>
-        /// <param name="structure">Elemento de la estructura del proyecto de construcción</param>
-        public void AddStructure(Structure structure)
+        /// <param name="element">Elemento de la estructura del proyecto de construcción</param>
+        public void AddElement(Element element)
         {
-            Phase phase = structure.Task.Phase;
-            int zone = structure.Task.Zone;
-
-            if (!structures.TryGetValue((phase, zone), out List<Structure> structure_list))
+            foreach(Task t in element.Tasks)
             {
-                structure_list = new List<Structure>();
-                structures.Add((phase, zone), structure_list);
+                Phase phase = t.Phase;
+                Zone zone = t.Zone;
+                Level level = element.Level;
+
+                if (!elements.TryGetValue((phase, zone, level), out List<Element> element_list))
+                {
+                    element_list = new List<Element>();
+                    elements.Add((phase, zone, level), element_list);
+                }
+
+                element_list.Add(element);
             }
 
-            structure_list.Add(structure);
+
+
+            
         }
     }
 }

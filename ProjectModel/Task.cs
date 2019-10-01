@@ -2,6 +2,9 @@
 
 namespace ProjectModel
 {
+    /// <summary>
+    /// TODO
+    /// </summary>
     [Serializable]
     public class Task
     {
@@ -22,8 +25,8 @@ namespace ProjectModel
         /// <summary>
         /// Zona en la que ocurre esta tarea
         /// </summary>
-        public int Zone { get => zone; }
-        private int zone;
+        public Zone Zone { get => zone; }
+        private Zone zone;
 
         /// <summary>
         /// Fecha en la que debería comenzar la ejecución de la tarea
@@ -45,7 +48,7 @@ namespace ProjectModel
         /// <param name="name">Nombre de la tarea</param>
         /// <param name="startDate">Fecha en la que debería comenzar la ejecución de la tarea</param>
         /// <param name="dueDate">Fecha en la que debería terminar la ejecución de la tarea</param>
-        public Task(Phase phase, int zone, string name, DateTime startDate, DateTime dueDate)
+        public Task(Phase phase, Zone zone, string name, DateTime startDate, DateTime dueDate)
         {
             this.phase = phase;
             this.zone = zone;
