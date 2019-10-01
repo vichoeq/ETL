@@ -15,7 +15,7 @@ namespace Extractors
     public class ExcelExtractor
     {
         public string Path;
-        Excel.Application xlApp;
+        public Excel.Application xlApp;
         public Excel.Range XlRange;
         public Excel._Worksheet xlWorksheet;
         public Excel.Workbook xlWorkbook;
