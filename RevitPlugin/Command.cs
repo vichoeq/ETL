@@ -8,17 +8,26 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
-namespace Lab1PlaceGroup
+///
+namespace RevitPlugin
 {
-
+    /// <summary>
+    /// 
+    /// </summary>
     [Transaction(TransactionMode.Manual)]
-
-    [Regeneration(RegenerationOption.Manual)]
-
-    public class Class1 : IExternalCommand
-
+    [Regeneration(RegenerationOption.Manual)]        
+    public class Command : IExternalCommand
     {
+        private string excelPath = "";
+        private string projectPath = "";
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="commandData"></param>
+        /// <param name="message"></param>
+        /// <param name="elements"></param>
+        /// <returns></returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
 
         {
@@ -30,7 +39,7 @@ namespace Lab1PlaceGroup
             TaskDialog mainDialog = new TaskDialog("Hello");
             mainDialog.MainInstruction = "Bienvenidos!";
             mainDialog.MainContent =
-             "Ingresa los archivos Excel y Project de tu proyecto.";
+             "Ingresssssa los archivos Excel y Project de tu proyecto.";
             mainDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1,
                           "Seleccione archivo Excel");
             mainDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2,
@@ -59,7 +68,7 @@ namespace Lab1PlaceGroup
                 ModelPath userPath2 =  openFileDialog2.GetSelectedModelPath();
                 ModelPathUtils.ConvertModelPathToUserVisiblePath(userPath2);
                 TaskDialog userDialog2 = new TaskDialog("Archivo seleccionado");
-                userDialog2.MainContent = "Seleccionaste " + userPath2;
+                userDialog2.MainContent = "Seleccionasblablablaaaaaaaaste " + ModelPathUtils.ConvertModelPathToUserVisiblePath(userPath2);
                 userDialog2.Show();
 
             }
