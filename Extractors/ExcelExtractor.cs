@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,7 +15,10 @@ namespace Extractors
     public class ExcelExtractor
     {
         public string Path;
+        Excel.Application xlApp;
         public Excel.Range XlRange;
+        public Excel._Worksheet xlWorksheet;
+        public Excel.Workbook xlWorkbook;
         int rowCount;
         int colCount;
 
@@ -25,13 +29,12 @@ namespace Extractors
         public ExcelExtractor(string path)
         {
             Path = path;
-            Excel.Application xlApp = new Excel.Application();
-            Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(path);
-            Excel._Worksheet xlWorksheet = xlWorkbook.Sheets[1];
+            xlApp = new Excel.Application();
+            xlWorkbook = xlApp.Workbooks.Open(path);
+            xlWorksheet = xlWorkbook.Sheets[1];
             XlRange = xlWorksheet.UsedRange;
             rowCount = XlRange.Rows.Count;
             colCount = XlRange.Columns.Count;
-
         }
 
         /// <summary>
@@ -46,7 +49,7 @@ namespace Extractors
             for (int i = 4; i <= rowCount; i++)
             {
                 
-                if (XlRange.Cells[i, 1] != null && XlRange.Cells[i, 2] == null && XlRange.Cells[i, 1].Value2 != null) 
+                if (XlRange.Cells[i, 1] != null && XlRange.Cells[i, 1].Value2 != null && XlRange.Cells[i, 2].Value2 == null) 
                 {
                     foreach(string phase in Enum.GetNames(typeof(Phase)))
                     {
@@ -64,7 +67,8 @@ namespace Extractors
                 {
                     //Console.WriteLine("row:" + i.ToString());
                     
-                    Material newMaterial = new Material(XlRange.Cells[i,2].Value2.ToString(), Convert.ToInt32(XlRange.Cells[i, 5].Value2) , XlRange.Cells[i,3].Value2.ToString(), XlRange.Cells[i, 1].Value2.ToString());
+                    //Material newMaterial = new Material(XlRange.Cells[i,2].Value2.ToString(), Convert.ToInt32(XlRange.Cells[i, 5].Value2) , XlRange.Cells[i,3].Value2.ToString(), XlRange.Cells[i, 1].Value2.ToString());
+                    Material newMaterial = new Material(XlRange.Cells[i, 2].Value2, Convert.ToInt32(XlRange.Cells[i, 5].Value2), XlRange.Cells[i, 3].Value2, XlRange.Cells[i, 1].Value2);
 
                     if (!materialsInfo.TryGetValue((newMaterial.Family, currentPhase), out List<Material> materialList))
                     {
@@ -78,6 +82,24 @@ namespace Extractors
             return materialsInfo;
 
 
+        }
+        public void Close()
+        {
+            //cleanup
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            //rule of thumb for releasing com objects:
+            //  never use two dots, all COM objects must be referenced and released individually
+            //  ex: [somthing].[something].[something] is bad
+            //release com objects to fully kill excel process from running in the background
+            Marshal.ReleaseComObject(XlRange);
+            Marshal.ReleaseComObject(xlWorksheet);
+            //close and release
+            xlWorkbook.Close();
+            Marshal.ReleaseComObject(xlWorkbook);
+            //quit and release
+            xlApp.Quit();
+            Marshal.ReleaseComObject(xlApp);
         }
         private static Phase PhaseFromString(string phase)
         {
