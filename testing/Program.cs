@@ -11,8 +11,8 @@ namespace testing
     {
         static void Main(string[] args)
         {
-            string pathExcel = @"C:\Users\Usuario\Documents\archibos proyecto capstone\Estimación de costos.xlsm";
-            string pathProject = @"C:\Users\Usuario\Documents\archibos proyecto capstone\Modelo de proceso.mpp";
+            string pathExcel = @"C:\Users\Vicho\Documents\PUC\2019-2\Capstone\ETL\data\Estimación de costos.xlsm";
+            string pathProject = @"C:\Users\Vicho\Documents\PUC\2019-2\Capstone\ETL\data\Modelo de proceso.mpp";
             ExcelExtractor excelExtractor = new ExcelExtractor(pathExcel);
             MicrosoftProjectFile projectFileExtractor = new MicrosoftProjectFile(pathProject);
             List<Material> materials = excelExtractor.Extract();
