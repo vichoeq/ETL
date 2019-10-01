@@ -10,15 +10,15 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using Extractors;
-///
-namespace RevitPlugin
+
+namespace CIPYCS
 {
     /// <summary>
     /// 
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]        
-    public class Command : IExternalCommand
+    public class Extractor : IExternalCommand
     {
         private string excelPath = "";
         private string projectPath = "";
@@ -32,15 +32,12 @@ namespace RevitPlugin
         /// <returns></returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            // crear aplicación
-            Application app = commandData.Application.Application;
             Document activeDoc = commandData.Application.ActiveUIDocument.Document;
 
             bool done = false;
 
             while(!done)
             {
-                // Ventana inicial 
                 TaskDialog mainDialog = new TaskDialog("CIPYCS Extractor");
                 mainDialog.MainInstruction = "Bienvenidos!";
                 mainDialog.MainContent =
@@ -90,7 +87,7 @@ namespace RevitPlugin
                         projectPath = ChooseFile("Project files|*.mpp");
                         break;
                     case TaskDialogResult.CommandLink3:
-                        ETL(excelPath, projectPath, activeDoc, ".");
+                        ExtractAndTransform(excelPath, projectPath, activeDoc, ".");
                         done = true;
                         break;
                     default:
@@ -101,7 +98,7 @@ namespace RevitPlugin
             return Result.Succeeded;
         }
 
-        private void ETL(string excelPath, string projectPath, Document revit, string outputPath)
+        private void ExtractAndTransform(string excelPath, string projectPath, Document revit, string outputPath)
         {
             // ExcelExtractor excelExtractor = new ExcelExtractor(excelPath);
 

@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extractors", "Extractors\Ex
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectModel", "ProjectModel\ProjectModel.csproj", "{11E2F87E-61E3-4150-BEBC-2EDF9C876458}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevitPlugin", "RevitPlugin\RevitPlugin.csproj", "{38A0B60E-4890-4063-882F-364E3C82A7DB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CIPYCS", "RevitPlugin\CIPYCS.csproj", "{38A0B60E-4890-4063-882F-364E3C82A7DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
