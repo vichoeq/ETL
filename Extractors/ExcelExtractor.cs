@@ -42,10 +42,9 @@ namespace Extractors
         {
             //List<Material> rows_info = new List<Material>();
             Dictionary<(string, Phase), List<Material>> materialsInfo = new Dictionary<(string, Phase), List<Material>>();
-
+            Phase currentPhase = Phase.OBRA_GRUESA;
             for (int i = 4; i <= rowCount; i++)
             {
-                Phase currentPhase = Phase.OBRA_GRUESA;
                 if (XlRange.Cells[i, 1] != null &&  XlRange.Cells[i, 1].Value2 != null) 
                 {
                     foreach(string phase in Enum.GetNames(typeof(Phase)))
