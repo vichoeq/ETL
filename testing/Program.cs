@@ -13,9 +13,11 @@ namespace testing
         {
             string pathExcel = @"C:\Users\Usuario\Documents\archibos proyecto capstone\costos.xlsm";
             string pathProject = @"C:\Users\Usuario\Documents\archibos proyecto capstone\Modelo de proceso.mpp";
-            ExcelExtractor excelExtractor = new ExcelExtractor(pathExcel);
             MicrosoftProjectExtractor projectFileExtractor = new MicrosoftProjectExtractor(pathProject);
+            DateTime time = DateTime.Now;
+            ExcelExtractor excelExtractor = new ExcelExtractor(pathExcel);
             Dictionary<(string, Phase), List<Material>> materials = excelExtractor.Extract();
+            Console.WriteLine(DateTime.Now - time);
             Dictionary<(string, Phase, int), List<Task>> tasks = projectFileExtractor.Extract();
             Console.WriteLine("Materials:");
             foreach (KeyValuePair<(string, Phase), List<Material>> entry in materials)
@@ -37,6 +39,7 @@ namespace testing
             }
 
             var key = Console.ReadKey();
+            excelExtractor.Close();
 
 
         }
