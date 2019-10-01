@@ -14,35 +14,35 @@ using Extractors;
 namespace CIPYCS
 {
     /// <summary>
-    /// 
+    /// Extrae la información relevante del archivo .rvt para integrarla con el resto del proyecto
     /// </summary>
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]        
-    public class Extractor : IExternalCommand
+    public class RevitExtractor : IExternalCommand
     {
         private string excelPath = "";
         private string projectPath = "";
 
         /// <summary>
-        /// 
+        /// Comando ejecutado desde la aplicación de Autodesk Revit
         /// </summary>
-        /// <param name="commandData"></param>
-        /// <param name="message"></param>
-        /// <param name="elements"></param>
-        /// <returns></returns>
+        /// <param name="commandData">Información sobre la aplicación que lanzó el comando.</param>
+        /// <param name="message">Mensaje especial. No nos interesa.</param>
+        /// <param name="elements">Elementos seleccionados. No nos interesa.</param>
+        /// <returns>Éxito, Fracaso o "Cancelado" según como salieron las cosas</returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            Document activeDoc = commandData.Application.ActiveUIDocument.Document;
-
-            bool done = false;
-
-            while(!done)
+            UIApplication app = commandData.Application;
+            Document activeDoc = app.ActiveUIDocument.Document;
+            
+            while(true)
             {
-                TaskDialog mainDialog = new TaskDialog("CIPYCS Extractor");
-                mainDialog.MainInstruction = "Bienvenidos!";
-                mainDialog.MainContent =
-                 "Ingresa los archivos Excel y Project de tu proyecto";
-
+                TaskDialog mainDialog = new TaskDialog("Revit Extractor")
+                {
+                    MainInstruction = "Bienvenidos!",
+                    MainContent = "Ingresa los archivos Excel y Project de tu proyecto"
+                };
+                
                 bool ready = true;
 
                 string excelDialog;
@@ -53,7 +53,7 @@ namespace CIPYCS
                 }
                 else
                 {
-                    excelDialog = "" + Path.GetFileName(excelPath) + " seleccionado. ¿Escoger otro?";
+                    excelDialog = "EXCEL: " + Path.GetFileNameWithoutExtension(excelPath) + ". ¿Escoger otro?";
                 }
                 
                 mainDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, excelDialog);
@@ -66,7 +66,7 @@ namespace CIPYCS
                 }
                 else
                 {
-                    projectDialog = "" + Path.GetFileName(projectPath) + " seleccionado. ¿Escoger otro?";
+                    projectDialog = "PROJECT: " + Path.GetFileNameWithoutExtension(projectPath) + ". ¿Escoger otro?";
                 }
 
                 mainDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, projectDialog);
@@ -76,9 +76,11 @@ namespace CIPYCS
                     mainDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink3, "Exportar");
                 }
 
-                TaskDialogResult tResult = mainDialog.Show();
+                TaskDialogResult dialogResult = mainDialog.Show();
 
-                switch(tResult)
+                mainDialog.Dispose();
+
+                switch(dialogResult)
                 {
                     case TaskDialogResult.CommandLink1:
                         excelPath = ChooseFile("Excel files|*.xlsm;xls");
@@ -87,24 +89,32 @@ namespace CIPYCS
                         projectPath = ChooseFile("Project files|*.mpp");
                         break;
                     case TaskDialogResult.CommandLink3:
-                        ExtractAndTransform(excelPath, projectPath, activeDoc, ".");
-                        done = true;
-                        break;
+                        return ExtractAndTransform(excelPath, projectPath, activeDoc);
+                    case TaskDialogResult.Close:
+                        return Result.Cancelled;
                     default:
-                        throw new Exception("Comando inválido");
+                        return Result.Failed;
                 }
             }
-
-            return Result.Succeeded;
         }
 
-        private void ExtractAndTransform(string excelPath, string projectPath, Document revit, string outputPath)
-        {
+        private Result ExtractAndTransform(string excelPath, string projectPath, Document revit)
+        {                  
+
             // ExcelExtractor excelExtractor = new ExcelExtractor(excelPath);
 
             // MicrosoftProjectFile mpp = new MicrosoftProjectFile(projectPath);
-            
+
             // Hace cosas del ETL
+
+            TaskDialog mainDialog = new TaskDialog("Revit Extractor")
+            {
+                MainInstruction = "Archivos integrados exitosamente"
+            };
+
+            mainDialog.Show();
+
+            return Result.Succeeded;
         }
 
         private string ChooseFile(string format)
