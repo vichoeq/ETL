@@ -10,7 +10,7 @@ namespace Extractors
     /// <summary>
     /// Clase encargada de extraer la información de tareas de un archivo .MPP
     /// </summary>
-    public class MicrosoftProjectFile
+    public class MicrosoftProjectExtractor
     {
         private MPXJ.ProjectFile mpp;
 
@@ -18,7 +18,7 @@ namespace Extractors
         /// Abre un archivo de proyecto de Microsoft Project
         /// </summary>
         /// <param name="path">Ruta al archivo .MPP</param>
-        public MicrosoftProjectFile(string path)
+        public MicrosoftProjectExtractor(string path)
         {
             AbstractProjectReader reader = new MPPReader();
 

@@ -14,7 +14,7 @@ namespace testing
             string pathExcel = @"C:\Users\Usuario\Documents\archibos proyecto capstone\costos.xlsm";
             string pathProject = @"C:\Users\Usuario\Documents\archibos proyecto capstone\Modelo de proceso.mpp";
             ExcelExtractor excelExtractor = new ExcelExtractor(pathExcel);
-            MicrosoftProjectFile projectFileExtractor = new MicrosoftProjectFile(pathProject);
+            MicrosoftProjectExtractor projectFileExtractor = new MicrosoftProjectExtractor(pathProject);
             Dictionary<(string, Phase), List<Material>> materials = excelExtractor.Extract();
             Dictionary<(string, Phase, int), List<Task>> tasks = projectFileExtractor.Extract();
             Console.WriteLine("Materials:");

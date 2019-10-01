@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using System.Threading.Tasks;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using Extractors;
+using ProjectModel;
 
 namespace CIPYCS
 {
@@ -99,19 +99,36 @@ namespace CIPYCS
         }
 
         private Result ExtractAndTransform(string excelPath, string projectPath, Document revit)
-        {                  
+        {
+            TaskDialog mainDialog = new TaskDialog("Revit Extractor");
 
-            // ExcelExtractor excelExtractor = new ExcelExtractor(excelPath);
-
-            // MicrosoftProjectFile mpp = new MicrosoftProjectFile(projectPath);
-
-            // Hace cosas del ETL
-
-            TaskDialog mainDialog = new TaskDialog("Revit Extractor")
+            try
             {
-                MainInstruction = "Archivos integrados exitosamente"
-            };
+                ExcelExtractor excelExtractor = new ExcelExtractor(excelPath);
 
+                Dictionary<(string, ProjectModel.Phase), List<ProjectModel.Material>> materials = excelExtractor.Extract();
+            }
+            catch
+            {                
+                mainDialog.MainInstruction = "Error leyendo el archivo Excel";                
+                mainDialog.Show();
+                return Result.Failed;
+            }
+            
+            try
+            {
+                MicrosoftProjectExtractor mpp = new MicrosoftProjectExtractor(projectPath);
+
+                Dictionary<(string, ProjectModel.Phase, int), List<Task>> tasks = mpp.Extract();
+            }
+            catch
+            {
+                mainDialog.MainInstruction = "Error leyendo el archivo Project";
+                mainDialog.Show();
+                return Result.Failed;
+            }
+
+            mainDialog.MainInstruction = "Archivos integrados exitosamente";
             mainDialog.Show();
 
             return Result.Succeeded;
