@@ -83,10 +83,10 @@ namespace CIPYCS
                 switch(dialogResult)
                 {
                     case TaskDialogResult.CommandLink1:
-                        excelPath = ChooseFile("Excel files|*.xlsm;xls");
+                        excelPath = ChooseFile("Excel", "Excel files|*.xlsm;xls");
                         break;
                     case TaskDialogResult.CommandLink2:
-                        projectPath = ChooseFile("Project files|*.mpp");
+                        projectPath = ChooseFile("Microsoft Project", "Project files|*.mpp");
                         break;
                     case TaskDialogResult.CommandLink3:
                         return ExtractAndTransform(excelPath, projectPath, activeDoc);
@@ -102,11 +102,13 @@ namespace CIPYCS
         {
             TaskDialog mainDialog = new TaskDialog("Revit Extractor");
 
+            Building building = new Building();
+
             try
             {
                 ExcelExtractor excelExtractor = new ExcelExtractor(excelPath);
 
-                Dictionary<(string, ProjectModel.Phase), List<ProjectModel.ElementType>> materials = excelExtractor.Extract();
+                building.AddElementTypes(excelExtractor.Extract());
             }
             catch
             {                
@@ -119,7 +121,7 @@ namespace CIPYCS
             {
                 MicrosoftProjectExtractor mpp = new MicrosoftProjectExtractor(projectPath);
 
-                Dictionary<(string, ProjectModel.Phase, Zone), List<Task>> tasks = mpp.Extract();
+                building.AddTasks(mpp.Extract());
             }
             catch
             {
@@ -128,17 +130,30 @@ namespace CIPYCS
                 return Result.Failed;
             }
 
+            building.Serialize(CreateFile("Binary Files|*.bin"));
+
             mainDialog.MainInstruction = "Archivos integrados exitosamente";
             mainDialog.Show();
 
             return Result.Succeeded;
         }
 
-        private string ChooseFile(string format)
+        private string ChooseFile(string type, string format)
         {
             FileOpenDialog openFileDialog = new FileOpenDialog(format);
+            openFileDialog.Title = "Escoge el archivo " + type + " a procesar";
             openFileDialog.Show();
             ModelPath userPath = openFileDialog.GetSelectedModelPath();
+            ModelPathUtils.ConvertModelPathToUserVisiblePath(userPath);
+            return ModelPathUtils.ConvertModelPathToUserVisiblePath(userPath);
+        }
+
+        private string CreateFile(string format)
+        {
+            FileSaveDialog saveFileDialog = new FileSaveDialog(format);
+            saveFileDialog.Title = "Escoge donde guardar el resultado";
+            saveFileDialog.Show();
+            ModelPath userPath = saveFileDialog.GetSelectedModelPath();
             ModelPathUtils.ConvertModelPathToUserVisiblePath(userPath);
             return ModelPathUtils.ConvertModelPathToUserVisiblePath(userPath);
         }

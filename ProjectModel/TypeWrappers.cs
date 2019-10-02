@@ -9,6 +9,7 @@ namespace ProjectModel
     /// <summary>
     /// Representa una etapa de la construcción.
     /// </summary>
+    [Serializable]
     public struct Phase : IEquatable<Phase>, IEquatable<string>
     {
         private string value;
@@ -61,6 +62,7 @@ namespace ProjectModel
     /// <summary>
     /// Representa una zona de la construcción.
     /// </summary>
+    [Serializable]
     public struct Zone : IEquatable<Zone>, IEquatable<int>
     {
         private int value;
@@ -113,6 +115,7 @@ namespace ProjectModel
     /// <summary>
     /// Representa un nivel de la construcción. Opera como un Int
     /// </summary>
+    [Serializable]
     public struct Level : IEquatable<Level>, IEquatable<int>
     {
         private int value;
