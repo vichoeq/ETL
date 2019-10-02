@@ -11,25 +11,25 @@ namespace testing
     {
         static void Main(string[] args)
         {
-            string pathExcel = @"C:\Users\Usuario\Documents\archibos proyecto capstone\costos.xlsm";
-            string pathProject = @"C:\Users\Usuario\Documents\archibos proyecto capstone\Modelo de proceso.mpp";
+            string pathExcel = @"C:\Users\Pedro Bahamondes\Desktop\Capstone\Fuentes de información\Estimación de costos.xlsm";
+            string pathProject = @"C:\Users\Pedro Bahamondes\Desktop\Capstone\Fuentes de información\Modelo de proceso.mpp";
             MicrosoftProjectExtractor projectFileExtractor = new MicrosoftProjectExtractor(pathProject);
             DateTime time = DateTime.Now;
             ExcelExtractor excelExtractor = new ExcelExtractor(pathExcel);
-            Dictionary<(string, Phase), List<Material>> materials = excelExtractor.Extract();
+            Dictionary<(string, Phase), List<ElementType>> materials = excelExtractor.Extract();
             Console.WriteLine(DateTime.Now - time);
-            Dictionary<(string, Phase, int), List<Task>> tasks = projectFileExtractor.Extract();
+            Dictionary<(string, Phase, Zone), List<Task>> tasks = projectFileExtractor.Extract();
             Console.WriteLine("Materials:");
-            foreach (KeyValuePair<(string, Phase), List<Material>> entry in materials)
+            foreach (KeyValuePair<(string, Phase), List<ElementType>> entry in materials)
             {
                 Console.WriteLine(entry.Key.Item1 + "/" + entry.Key.Item2.ToString() + ":");
-                foreach (Material material in entry.Value)
+                foreach (ElementType material in entry.Value)
                 {
                     Console.WriteLine(material.Name);
                 }
             }
             Console.WriteLine("Task:");
-            foreach (KeyValuePair<(string, Phase, int), List<Task>> entry in tasks)
+            foreach (KeyValuePair<(string, Phase, Zone), List<Task>> entry in tasks)
             {
                 Console.WriteLine(entry.Key.Item1 + "/" + entry.Key.Item2.ToString() + "/" + entry.Key.Item3.ToString() + ":" );
                 foreach (Task task in entry.Value)

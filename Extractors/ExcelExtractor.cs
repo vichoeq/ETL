@@ -10,17 +10,17 @@ using ProjectModel;
 namespace Extractors
 {
     /// <summary>
-    /// Clase encargada de extraer y paresar la información de materiales de un archivo .xlsm
+    /// Clase encargada de extraer y parsear la información de elementTypes de un archivo .xlsm
     /// </summary>
     public class ExcelExtractor
     {
-        public string Path;
-        public Excel.Application xlApp;
-        public Excel.Range XlRange;
-        public Excel._Worksheet xlWorksheet;
-        public Excel.Workbook xlWorkbook;
-        int rowCount;
-        int colCount;
+        private string Path;
+        private Excel.Application xlApp;
+        private Excel.Range XlRange;
+        private Excel._Worksheet xlWorksheet;
+        private Excel.Workbook xlWorkbook;
+        private int rowCount;
+        private int colCount;
 
         /// <summary>
         /// Abre un archivo de Xlrange de Microsoft Excel
@@ -38,51 +38,55 @@ namespace Extractors
         }
 
         /// <summary>
-        /// Extrae todos los materiales del archivo, asociandolas a su familia, fase 
+        /// Extrae todos los elementTypees del archivo, asociandolas a su familia, fase 
         /// </summary>
-        /// <returns>Un diccionario con la lista de materiales correspondientes a una misma familia, fase</returns>
-        public Dictionary<(string, Phase), List<Material>> Extract()
+        /// <returns>Un diccionario con la lista de elementTypees correspondientes a una misma familia, fase</returns>
+        public Dictionary<(string, Phase), List<ElementType>> Extract()
         {
-            //List<Material> rows_info = new List<Material>();
-            Dictionary<(string, Phase), List<Material>> materialsInfo = new Dictionary<(string, Phase), List<Material>>();
-            Phase currentPhase = Phase.OBRA_GRUESA;
-            for (int i = 4; i <= rowCount; i++)
+            //List<ElementType> rows_info = new List<ElementType>();
+            Dictionary<(string, Phase), List<ElementType>> elementTypesInfo = new Dictionary<(string, Phase), List<ElementType>>();
+            Phase currentPhase = "OBRA GRUESA";
+            for (int row = 4; row <= rowCount; row++)
             {
-                
-                if (XlRange.Cells[i, 1] != null && XlRange.Cells[i, 1].Value2 != null && XlRange.Cells[i, 2].Value2 == null) 
+                // TODO tiene que haber una forma mas directa de identificar esto
+                if (XlRange.Cells[row, 1] != null && XlRange.Cells[row, 1].Value2 != null && XlRange.Cells[row, 2].Value2 == null) 
                 {
-                    foreach(string phase in Enum.GetNames(typeof(Phase)))
+                    // TODO Sin hardcodeo de etapas
+                    foreach(string validPhase in new string[] {"OBRA GRUESA", "TERMINACIONES", "INSTALACIONES"})
                     {
-
-                        if (phase == XlRange.Cells[i, 1].Value2.ToString().Replace(" ", "_"))
+                        string possiblePhase = XlRange.Cells[row, 1].Value2.ToString();
+                        if (possiblePhase == validPhase)
                         {
-                            //Console.WriteLine("Phase:" + phase );
-                            currentPhase = PhaseFromString(XlRange.Cells[i, 1].Value2.ToString());
+                            currentPhase = possiblePhase;
                         }
                     }
                 }
                 
                 
-                if (XlRange.Cells[i, 2] != null && XlRange.Cells[i, 2].Value2 != null)
+                // TODO tiene que haber una forma mas directa de identificar esto
+                if (XlRange.Cells[row, 2] != null && XlRange.Cells[row, 2].Value2 != null)
                 {
                     //Console.WriteLine("row:" + i.ToString());
-                    
-                    //Material newMaterial = new Material(XlRange.Cells[i,2].Value2.ToString(), Convert.ToInt32(XlRange.Cells[i, 5].Value2) , XlRange.Cells[i,3].Value2.ToString(), XlRange.Cells[i, 1].Value2.ToString());
-                    Material newMaterial = new Material(XlRange.Cells[i, 2].Value2, Convert.ToInt32(XlRange.Cells[i, 5].Value2), XlRange.Cells[i, 3].Value2, XlRange.Cells[i, 1].Value2);
 
-                    if (!materialsInfo.TryGetValue((newMaterial.Family, currentPhase), out List<Material> materialList))
+                    //ElementType newElementType = new ElementType(XlRange.Cells[i,2].Value2.ToString(), Convert.ToInt32(XlRange.Cells[i, 5].Value2) , XlRange.Cells[i,3].Value2.ToString(), XlRange.Cells[i, 1].Value2.ToString());
+                    ElementType newElementType = new ElementType(XlRange.Cells[row, 2].Value2, Convert.ToInt32(XlRange.Cells[row, 5].Value2), XlRange.Cells[row, 3].Value2, XlRange.Cells[row, 1].Value2);
+
+                    if (!elementTypesInfo.TryGetValue((newElementType.Family, currentPhase), out List<ElementType> elementTypeList))
                     {
-                        materialList = new List<Material>();
-                        materialsInfo.Add((newMaterial.Family, currentPhase), materialList);
+                        elementTypeList = new List<ElementType>();
+                        elementTypesInfo.Add((newElementType.Family, currentPhase), elementTypeList);
                     }
-                    materialList.Add(newMaterial);
+                    elementTypeList.Add(newElementType);
 
                 }                
             }
-            return materialsInfo;
+            return elementTypesInfo;
 
 
         }
+        /// <summary>
+        /// Cierra el excel y todos los recursos asociados
+        /// </summary>
         public void Close()
         {
             //cleanup
@@ -100,21 +104,7 @@ namespace Extractors
             //quit and release
             xlApp.Quit();
             Marshal.ReleaseComObject(xlApp);
-        }
-        private static Phase PhaseFromString(string phase)
-        {
-            switch (phase)
-            {
-                case "OBRA GRUESA":
-                    return Phase.OBRA_GRUESA;
-                case "TERMINACIONES":
-                    return Phase.TERMINACIONES;
-                case "INSTALACIONES":
-                    return Phase.INSTALACIONES;
-                default:
-                    throw new Exception("Fase inválida: \"" + phase + "\"");
-            }
-        }
+        }        
     }
 
 }

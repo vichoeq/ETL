@@ -106,7 +106,7 @@ namespace CIPYCS
             {
                 ExcelExtractor excelExtractor = new ExcelExtractor(excelPath);
 
-                Dictionary<(string, ProjectModel.Phase), List<ProjectModel.Material>> materials = excelExtractor.Extract();
+                Dictionary<(string, ProjectModel.Phase), List<ProjectModel.ElementType>> materials = excelExtractor.Extract();
             }
             catch
             {                
@@ -119,7 +119,7 @@ namespace CIPYCS
             {
                 MicrosoftProjectExtractor mpp = new MicrosoftProjectExtractor(projectPath);
 
-                Dictionary<(string, ProjectModel.Phase, int), List<Task>> tasks = mpp.Extract();
+                Dictionary<(string, ProjectModel.Phase, Zone), List<Task>> tasks = mpp.Extract();
             }
             catch
             {

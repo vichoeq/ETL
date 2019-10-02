@@ -29,9 +29,9 @@ namespace Extractors
         /// Extrae todas las tareas del archivo, asociandolas a su familia, fase y zona
         /// </summary>
         /// <returns>Un diccionario con la lista de tareas correspondientes a una misma familia, fase y zona</returns>
-        public Dictionary<(string, Phase, int), List<Task>> Extract()
+        public Dictionary<(string, Phase, Zone), List<Task>> Extract()
         {
-            Dictionary<(string, Phase, int), List<Task>> task_info = new Dictionary<(string, Phase, int), List<Task>>();
+            Dictionary<(string, Phase, Zone), List<Task>> task_info = new Dictionary<(string, Phase, Zone), List<Task>>();
 
             MPXJ.TaskContainer tasks = mpp.Tasks;
 
@@ -52,9 +52,9 @@ namespace Extractors
                     // En los archivos de ejemplo una tarea puede estar en más de una zona. En ese caso aparece como "zona 1,2"
                     
                     string taskPhase;
-                    // TODO es esto importante? 
                     string taskNivel;           
 
+                    // TODO hardcodeado del archivo .mpp que nos pasaron, esto no puede ser así
                     if (t.ParentTask.Name.ToLower() == taskZone) 
                     {
                         taskPhase = t.ParentTask.ParentTask.Name;
@@ -71,9 +71,12 @@ namespace Extractors
                     // En caso de que una tarea abarque más de una zona, se convierte en múltiples tareas, una para cada zona.
                     foreach (string z in zones)
                     {
-                        int zone = int.Parse(z);
-                        Phase phase = PhaseFromString(taskPhase);
-                        Task newTask = new Task(phase, zone, taskName, taskStart, taskEnd);
+                        Zone zone = int.Parse(z);
+                        Phase phase = taskPhase;
+                        // TODO esto asume que los niveles son de la forma "Nivel N"
+                        Level level = int.Parse(taskNivel.Split(' ')[1]);
+
+                        Task newTask = new Task(phase, zone, level, taskName, taskStart, taskEnd);
 
                         // Si no hay ninguna lista de tareas para esta famila, fase y zona, creamos una
                         if (!task_info.TryGetValue((taskFamily, phase, zone), out List<Task> taskList))
@@ -87,26 +90,6 @@ namespace Extractors
             }
 
             return task_info;
-        }
-        
-        /// <summary>
-        /// Obtiene el enum Phase a partir del string que aparece en el MPP
-        /// </summary>
-        /// <param name="phase">Fase del proyecto como string</param>
-        /// <returns>Fase del proyecto como enum</returns>
-        private static Phase PhaseFromString(string phase)
-        {
-            switch(phase)
-            {
-                case "Obra gruesa": 
-                    return Phase.OBRA_GRUESA;
-                case "Terminaciones":
-                    return Phase.TERMINACIONES;
-                case "Instalaciones":
-                    return Phase.INSTALACIONES;
-                default:
-                    throw new Exception("Fase inválida: \"" + phase + "\"");
-            }
         }
 
         /// <summary>

@@ -43,10 +43,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Building.cs" />
-    <Compile Include="Material.cs" />
+    <Compile Include="ElementType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Structure.cs" />
+    <Compile Include="Element.cs" />
     <Compile Include="Task.cs" />
+    <Compile Include="TypeWrappers.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
